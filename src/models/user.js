@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema({
     type: String
   }
 });
+userSchema.index({ username: 1 })
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this
