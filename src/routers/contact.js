@@ -83,7 +83,12 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
       const date = new Date()
       const dateInNumber = date.getDate() + 100 * (date.getMonth() + 1 + 100 * date.getFullYear())
       const contactLog = new ContactLog({ userId: req.user._id, contactId: id, dateInNumber, activity: 'update' })
-      Object.keys(req.body).forEach(u => contact[u] = req.body[u])
+      Object.keys(req.body).forEach(u => {
+        if (u === 'photo' && req.body[u] === '') {
+        } else {
+          contact[u] = req.body[u]
+        }
+      })
       await Promise.all([contact.save(), contactLog.save()])
       res.status(200).send(contact)
     }
