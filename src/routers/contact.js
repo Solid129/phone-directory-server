@@ -75,7 +75,8 @@ router.post('/contacts/add', auth, async (req, res) => {
   try {
     const contact = new Contact({ ...req.body, user: req.user._id })
     await contact.save()
-    res.status(201).send(contact)
+    const contacts = await Contact.find({ user: req.user._id })
+    res.status(201).send(contacts)
   } catch (error) {
     console.error(error)
     res.status(400).send(error)
@@ -101,8 +102,7 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
       const date = new Date()
       const dateInNumber = date.getDate() + 100 * (date.getMonth() + 1 + 100 * date.getFullYear())
       const contactLog = new ContactLog({ userId: req.user._id, contactId: id, dateInNumber, activity: 'update' })
-      await contactLog.save()
-      
+
       // checking if image was present before and user didn't update it to new image
       // then not updating it 
       Object.keys(req.body).forEach(u => {
@@ -112,7 +112,8 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
         }
       })
       await Promise.all([contact.save(), contactLog.save()])
-      res.status(200).send(contact)
+      const contacts = await Contact.find({ user: req.user._id })
+      res.status(200).send(contacts)
     }
   } catch (error) {
     console.error(error)
@@ -129,7 +130,8 @@ router.delete('/contacts/:id', auth, async (req, res) => {
       throw new Error()
     } else {
       await Contact.findByIdAndDelete(id)
-      res.status(200).send(contact)
+      const contacts = await Contact.find({ user: req.user._id })
+      res.status(200).send(contacts)
     }
   } catch (error) {
     console.error(error)
