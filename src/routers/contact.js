@@ -106,7 +106,7 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
       // checking if image was present before and user didn't update it to new image
       // then not updating it 
       Object.keys(req.body).forEach(u => {
-        if (u === 'photo' && req.body[u] === '') {
+        if (u === 'photo' && (req.body[u] === '' || req.body[u] === null)) {
         } else {
           contact[u] = req.body[u]
         }
