@@ -2,8 +2,14 @@ const express = require('express')
 const Contact = require('../models/contact')
 const ContactLog = require('../models/contact_log')
 const router = new express.Router()
+
+// middleware to authenticate every request
 const auth = require('../middlewares/auth')
 
+
+/**
+ * get all contacts for user
+ */
 router.get('/contacts', auth, async (req, res) => {
   try {
     const contacts = await Contact.find({ user: req.user._id })
@@ -14,6 +20,10 @@ router.get('/contacts', auth, async (req, res) => {
   }
 })
 
+
+/**
+ * get single request contact and save contact log for same
+ */
 router.get('/contacts/:id', auth, async (req, res) => {
   try {
     const id = req.params.id
@@ -21,14 +31,18 @@ router.get('/contacts/:id', auth, async (req, res) => {
     if (!contact) {
       throw new Error()
     } else {
+      // calculalate today's date in format `YYYYMMDD` as number 
       const date = new Date()
       let dateInNumber = date.getDate() + 100 * (date.getMonth() + 1 + 100 * date.getFullYear())
       const contactLog = new ContactLog({ userId: req.user._id, contactId: id, dateInNumber, activity: 'view' })
       await contactLog.save()
 
+      // change current date to 7 days before for fetching views of every past 7 days
       date.setDate(date.getDate() - 7)
       dateInNumber = date.getDate() + 100 * (date.getMonth() + 1 + 100 * date.getFullYear())
 
+      // aggregate query is used to fetch contacts for current date to 7 day before
+      // and then project it in format of `{_id:YYYYMMDD,views:number}`
       const [totalViews, sevenDaysViews] = await Promise.all([
         ContactLog.find({ userId: req.user._id, contactId: id, activity: 'view' }).count(),
         ContactLog.aggregate([
@@ -56,6 +70,7 @@ router.get('/contacts/:id', auth, async (req, res) => {
   }
 })
 
+// request to save contact for user
 router.post('/contacts/add', auth, async (req, res) => {
   try {
     const contact = new Contact({ ...req.body, user: req.user._id })
@@ -67,9 +82,11 @@ router.post('/contacts/add', auth, async (req, res) => {
   }
 })
 
+// request to update contact 
 router.patch('/contacts/:id/update', auth, async (req, res) => {
   try {
     const id = req.params.id
+    // if body have values other than allowed values then throw error of `Invalid Update `
     const allowed = ["firstName", "middleName", "lastName", "email", "mobileNumber", "landlineNumber", "photo", "notes"]
     Object.keys(req.body).forEach(u => {
       if (!allowed.includes(u)) {
@@ -80,9 +97,14 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
     if (!contact) {
       throw new Error()
     } else {
+
       const date = new Date()
       const dateInNumber = date.getDate() + 100 * (date.getMonth() + 1 + 100 * date.getFullYear())
       const contactLog = new ContactLog({ userId: req.user._id, contactId: id, dateInNumber, activity: 'update' })
+      await contactLog.save()
+      
+      // checking if image was present before and user didn't update it to new image
+      // then not updating it 
       Object.keys(req.body).forEach(u => {
         if (u === 'photo' && req.body[u] === '') {
         } else {
@@ -98,6 +120,7 @@ router.patch('/contacts/:id/update', auth, async (req, res) => {
   }
 })
 
+// request for deleting contact
 router.delete('/contacts/:id', auth, async (req, res) => {
   try {
     const id = req.params.id

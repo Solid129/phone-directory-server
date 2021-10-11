@@ -1,4 +1,8 @@
 const mongoose = require('mongoose')
+
+/**
+ * user's contact schema 
+ */
 const contactSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,

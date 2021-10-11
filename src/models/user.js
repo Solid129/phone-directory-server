@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+
+/**
+ * users schema for storing username, password and current authorized token
+ */
 const userSchema = mongoose.Schema({
   username: {
     type: String,
@@ -15,8 +19,12 @@ const userSchema = mongoose.Schema({
     type: String
   }
 });
+
 userSchema.index({ username: 1 })
 
+/**
+ * genrating token on user login and sign up
+ */
 userSchema.methods.generateAuthToken = async function () {
   const user = this
   const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SIGNATURE, { expiresIn: "1h" })
@@ -26,7 +34,11 @@ userSchema.methods.generateAuthToken = async function () {
   return token
 }
 
-
+/**
+ * check if username and paswword are correct for login request 
+ * @param {String} username 
+ * @param {String} password 
+ */
 userSchema.statics.authenticate = async (username, password) => {
   const user = await User.findOne({ username })
 

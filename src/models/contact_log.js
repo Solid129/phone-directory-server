@@ -1,4 +1,8 @@
 const mongoose = require('mongoose')
+
+/**
+ * schema for storing contact activity log
+ */
 const contactLogSchema = mongoose.Schema({
   userId: {
     type: String,
