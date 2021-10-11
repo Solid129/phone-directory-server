@@ -4,7 +4,7 @@
 
 * Clone this project.
 
-> git clone https://github.com/Solid129/phone-directory-service
+> git clone https://github.com/Solid129/phone-directory-server
 
 * Install dependencies of the project
 
