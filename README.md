@@ -1,29 +1,29 @@
 # Phone Directory App
 
-### Commands to Run
+### Installation
 
 * Clone this project.
+
+> git clone https://github.com/Solid129/phone-directory-service
+
 * Install dependencies of the project
 
-> npm i
+> npm install
 
 * Set environment variables of `PORT`, `JWT_SIGNATURE`, `MONGO_DB_URL`
 * Run the project using
 
 > npm start
 
-
 ## Introduction
 
-  + Phone directory service to post, get and update contacts.
-  + username and password to authenticate for adding, getting or updating contacts.
+* Phone directory server to store, get and update contacts with JWT based username & password authentication.
 
 ### User
 
-* User model with username and password also containing current token for authorization.
-* password is hashed before storing
-
-Model used for User is:
+* User model contains username, password and the current token for authorization.
+* Password is hashed before storing. 
+Model for User:
 
 ```javascript
 {
@@ -35,10 +35,10 @@ Model used for User is:
 
 ### Contact
 
-* All CRUD operations request requires authorization.
-* Contact log is stored for every `view` and `update` activity.
-* Contact log is used to fetch total views of contact and last seven days per day views.
-Model used for Contact is:
+* All CRUD operations requests require authorization.
+* Contact log is stored for every view and update activity.
+* Contact log is used to fetch total views of a contact and per-day views of the last 7 days. 
+Model for Contact:
 
 ```javascript
 {
@@ -56,7 +56,7 @@ Model used for Contact is:
 }
 ```
 
-Model used for Contact Log is:
+Model for Contact Log:
 
 ```javascript
 {
